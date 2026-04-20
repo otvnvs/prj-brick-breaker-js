@@ -49,6 +49,20 @@
         document.addEventListener("mousemove", e => movePaddle(e.clientX));
         canvas.addEventListener("touchmove", e => { e.preventDefault(); movePaddle(e.touches[0].clientX); }, { passive: false });
 
+	function drawGameOver() {
+	    ctx.fillStyle = "#ff0000"; // Red text
+	    ctx.font = "bold 40px sans-serif";
+	    ctx.textAlign = "center";
+	    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
+	    
+	    ctx.font = "20px sans-serif";
+	    
+	    // Listen for next interaction to restart
+	    const restart = () => document.location.reload();
+	    canvas.addEventListener("mousedown", restart);
+	    canvas.addEventListener("touchstart", restart);
+	}
+
         // Game Loop
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -78,7 +92,11 @@
             if (y + dy < 8) dy = -dy;
             else if (y + dy > canvas.height - 12 - 8) {
                 if (x > paddleX && x < paddleX + paddleWidth) dy = -dy;
-                else if (y + dy > canvas.height) { alert("GAME OVER"); document.location.reload(); }
+                else if (y + dy > canvas.height) {
+            drawGameOver(); // Call custom red text function
+            return;        // CRITICAL: Stop the requestAnimationFrame loop
+
+		}
             }
             x += dx; y += dy;
             requestAnimationFrame(draw);
